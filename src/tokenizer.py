@@ -1,61 +1,70 @@
+from collections.abc import Callable
+from dataclasses import dataclass
 from tokens import Token, TokenType
 
-_ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-_SINGLE_CHAR = {
-    "=": TokenType.EQ,
-    "(": TokenType.LPAR,
-    ")": TokenType.RPAR,
-    "+": TokenType.PLUS,
-    "-": TokenType.MINUS,
-    ",": TokenType.COMMA,
-}
+@dataclass(frozen=True, slots=True)
+class TokenError(Exception):
+    text: str
+    pos: int
 
-def _identifier(s: str) -> tuple[str, str]:
-    l = len(s)
-    n = 1
-    while n < l and s[n] in _ALPHA:
-        n += 1
-    return s[:n], s[n:]
+class Tokenizer:
+    __slots__ = "_str", "_pos"
 
-def _literal(s: str) -> tuple[str, str]:
-    l = len(s)
-    n = 1
-    def to_nondigit():
-        nonlocal s, l, n
-        while n < l and s[n].isdigit():
-            n += 1
-    to_nondigit()
-    if n + 1 < l and s[n] == "." and s[n + 1].isdigit():
-        n += 2
-        to_nondigit()
-    return s[:n], s[n:]
+    def __init__(self, s: str, /):
+        self._str = s
+        self._pos = 0
 
-def tokenize(s: str) -> list[Token] | None:
-    tokens = []
-    while (s := s.lstrip()):
-        v = None
-        c = s[0]
-        if (t := _SINGLE_CHAR.get(c)) is not None:
-            s = s[1:]
-        elif c in _ALPHA:
-            v, s = _identifier(s)
-            t = TokenType.ID
-        elif c.isdigit():
-            v, s = _literal(s)
-            t = TokenType.LIT
-        elif s.startswith("**"):
-            s = s[2:]
-            t = TokenType.EXP
-        elif c == "*":
-            s = s[1:]
-            t = TokenType.MULT
-        elif s.startswith("//"):
-            s = s[2:]
-            t = TokenType.IDIV
-        elif c == "/":
-            s = s[1:]
-            t = TokenType.DIV
-        else:
-            return None
-        tokens.append(Token(t, v))
-    return tokens
+    def _skip_while(self, pred: Callable[[str], bool]):
+        while self._pos < len(self._str) and pred(self._str[self._pos]):
+            self._pos += 1
+
+    def _simple_token(self) -> Token | None:
+        mapping = (
+            ("=",  TokenType.EQ),
+            ("(",  TokenType.LPAR),
+            (")",  TokenType.RPAR),
+            ("+",  TokenType.PLUS),
+            ("-",  TokenType.MINUS),
+            ("**", TokenType.EXP),
+            ("*",  TokenType.MULT),
+            ("//", TokenType.IDIV),
+            ("/",  TokenType.DIV),
+            (",",  TokenType.COMMA),
+        )
+        for s, t in mapping:
+            if self._str.startswith(s, self._pos):
+                self._pos += len(s)
+                return Token(t)
+
+    def _identifier(self) -> Token | None:
+        start = self._pos
+        self._skip_while(lambda c: c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
+        return None if self._pos == start else Token(TokenType.ID, self._str[start:self._pos])
+
+    # TODO extend syntax
+    def _integer(self) -> Token | None:
+        start = self._pos
+        self._skip_while(lambda c: c.isdigit())
+        return None if self._pos == start else Token(TokenType.INT, self._str[start:self._pos])
+
+    # TODO implement
+    def _float(self) -> Token | None:
+        return None
+
+    def __iter__(self) -> 'Self':
+        return self
+
+    def __next__(self) -> Token | None:
+        self._skip_while(lambda c: c == " ")
+        if self._pos == len(self._str):
+            raise StopIteration
+        funcs = (
+            self._simple_token,
+            self._identifier,
+            self._integer,
+            self._float,
+        )
+        for f in funcs:
+            if (t := f()) is not None:
+                return t
+        raise TokenError(self._str, self._pos)
