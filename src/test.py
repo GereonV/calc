@@ -2,13 +2,13 @@ from tokens import Token, TokenType
 from tokenizer import TokenError, Tokenizer
 
 def tokenizer() -> str:
-    a = Token(TokenType.ID, "A")
-    eq = Token(TokenType.EQ)
-    mult = Token(TokenType.MULT)
-    minus = Token(TokenType.MINUS)
-    exp = Token(TokenType.EXP)
-    int = lambda x: Token(TokenType.INT, x)
-    float = lambda x: Token(TokenType.FLOAT, x)
+    a = Token(TokenType.ID, "A", None)
+    eq = Token(TokenType.EQ, None, None)
+    mult = Token(TokenType.MULT, None, None)
+    minus = Token(TokenType.MINUS, None, None)
+    exp = Token(TokenType.EXP, None, None)
+    int = lambda x: Token(TokenType.INT, x, None)
+    float = lambda x: Token(TokenType.FLOAT, x, None)
     first_test = [a, eq, int(5), mult, int(3), minus, int(1)]
     err = lambda s, p: (s, TokenError(s, p))
     tests = [

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import auto, Enum
 
 class TokenType(Enum):
@@ -19,7 +19,8 @@ class TokenType(Enum):
 @dataclass(frozen=True, slots=True)
 class Token:
     type: TokenType
-    value: str | int | float | None = None
+    value: str | int | float | None
+    pos: int = field(compare=False)
 
     def __str__(self) -> str:
         return self.type.name if self.str is None else f"{self.type.name}={self.str!r}"

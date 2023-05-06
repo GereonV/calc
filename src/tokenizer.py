@@ -33,13 +33,14 @@ class Tokenizer:
         )
         for s, t in mapping:
             if self._str.startswith(s, self._pos):
+                start = self._pos
                 self._pos += len(s)
-                return Token(t)
+                return Token(t, None, start)
 
     def _identifier(self) -> Token | None:
         start = self._pos
         self._skip_while(lambda c: c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
-        return None if self._pos == start else Token(TokenType.ID, self._str[start:self._pos])
+        return None if self._pos == start else Token(TokenType.ID, self._str[start:self._pos], start)
 
     # TODO extend syntax
     def _literal(self) -> Token | None:
@@ -48,12 +49,12 @@ class Tokenizer:
             self._pos += 1
             self._skip_while(lambda c: c.isdigit())
             if self._pos == len(self._str) or self._str[self._pos] != ".":
-                return Token(TokenType.INT, int(self._str[start:self._pos]))
+                return Token(TokenType.INT, int(self._str[start:self._pos]), start)
         elif c != ".":
             return None
         self._pos += 1
         self._skip_while(lambda c: c.isdigit())
-        return Token(TokenType.FLOAT, float(self._str[start:self._pos]))
+        return Token(TokenType.FLOAT, float(self._str[start:self._pos]), start)
 
     def __iter__(self) -> 'Self':
         return self
