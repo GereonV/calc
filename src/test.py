@@ -1,6 +1,7 @@
-from tokens import Token, tokenize, TokenType
+from tokens import Token, TokenType
+from tokenizer import tokenize
 
-def tokens() -> str:
+def tokenize() -> str:
     a = Token(TokenType.ID, "A")
     eq = Token(TokenType.EQ)
     mult = Token(TokenType.MULT)
@@ -33,7 +34,7 @@ def tokens() -> str:
 
 def main():
     test = lambda n, t: print(f"{n}: {t()}")
-    test("Tokens", tokens)
+    test("Tokens", tokenize)
 
 if __name__ == "__main__":
     main()
