@@ -42,13 +42,12 @@ class Tokenizer:
         return None if self._pos == start else Token(TokenType.ID, self._str[start:self._pos])
 
     # TODO extend syntax
-    def _integer(self) -> Token | None:
+    # TODO floats
+    def _literal(self) -> Token | None:
         start = self._pos
         self._skip_while(lambda c: c.isdigit())
-        return None if self._pos == start else Token(TokenType.INT, self._str[start:self._pos])
-
-    # TODO implement
-    def _float(self) -> Token | None:
+        if self._pos != start and (self._pos == len(self._str) or self._str[self._pos] != "."):
+            return Token(TokenType.INT, int(self._str[start:self._pos]))
         return None
 
     def __iter__(self) -> 'Self':
@@ -61,8 +60,7 @@ class Tokenizer:
         funcs = (
             self._simple_token,
             self._identifier,
-            self._integer,
-            self._float,
+            self._literal,
         )
         for f in funcs:
             if (t := f()) is not None:
