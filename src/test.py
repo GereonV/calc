@@ -8,6 +8,7 @@ def tokenizer() -> str:
     minus = Token(TokenType.MINUS)
     exp = Token(TokenType.EXP)
     int = lambda x: Token(TokenType.INT, x)
+    float = lambda x: Token(TokenType.FLOAT, x)
     first_test = [a, eq, int(5), mult, int(3), minus, int(1)]
     err = lambda s, p: (s, TokenError(s, p))
     tests = [
@@ -16,6 +17,11 @@ def tokenizer() -> str:
         ("A= 5* 3 -1  ", first_test),
         ("5***2", [int(5), exp, mult, int(2)]),
         ("5**2", [int(5), exp, int(2)]),
+        ("5.", [float(5)]),
+        ("5.0", [float(5)]),
+        ("  5.0  ", [float(5)]),
+        ("  .5  ", [float(.5)]),
+        (".0", [float(0)]),
         err(";", 0),
         err("abc;", 3),
     ]

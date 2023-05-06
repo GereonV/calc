@@ -19,7 +19,7 @@ class TokenType(Enum):
 @dataclass(frozen=True, slots=True)
 class Token:
     type: TokenType
-    value: str | int | float = None
+    value: str | int | float | None = None
 
     def __str__(self) -> str:
         return self.type.name if self.str is None else f"{self.type.name}={self.str!r}"
