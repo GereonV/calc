@@ -82,28 +82,32 @@ class _Parser:
         EXPECTED = TokenType.ID, TokenType.INT, TokenType.FLOAT, TokenType.LPAR, TokenType.MINUS
         if self._next is None:
             raise ParserError(EXPECTED, None)
-        current = self._next
-        self._advance()
-        match current.type:
-            case TokenType.INT:   nt = NodeType.INT
-            case TokenType.FLOAT: nt = NodeType.FLOAT
-            case TokenType.ID:    nt = None if self._next_type_is(TokenType.LPAR) else NodeType.IDENTIFIER
+        match self._next.type:
+            case TokenType.INT:
+                node = Node(NodeType.INT, self._next.value)
+            case TokenType.FLOAT:
+                node = Node(NodeType.FLOAT, self._next.value)
+            case TokenType.LPAR:
+                self._advance()
+                node = self._sum()
+                if not self._next_type_is(TokenType.RPAR):
+                    raise ParserError((TokenType.RPAR,), self._next)
+            case TokenType.ID:
+                id = self._next.value
+                self._advance()
+                if not self._next_type_is(TokenType.LPAR):
+                    return Node(NodeType.IDENTIFIER, id)
+                self._advance()
+                params = [self._sum()]
+                while self._next_type_is(TokenType.COMMA):
+                    self._advance()
+                    params.append(self._sum())
+                if not self._next_type_is(TokenType.RPAR):
+                    raise ParserError((TokenType.COMMA, TokenType.RPAR), self._next)
+                node = Node(NodeType.CALL, (id, *params))
             case _: raise ParserError(EXPECTED, current)
-        if nt is not None:
-            return Node(nt, current.value)
         self._advance()
-        params = [self._sum()]
-        EXPECTED = (*EXPECTED, TokenType.RPAR, TokenType.COMMA)
-        while self._next is not None:
-            if self._next.type == TokenType.RPAR:
-                self._advance()
-                return Node(NodeType.CALL, (current.value, *params))
-            if self._next.type == TokenType.COMMA:
-                self._advance()
-                params.append(self._sum())
-            else:
-                break
-        raise ParserError(EXPECTED, self._next)
+        return node
 
 def parse(tokens: Iterable[Token]) -> Node:
     return _Parser(iter(tokens))._stmnt()
