@@ -21,8 +21,8 @@ class _Parser:
         except StopIteration:
             self._next = None
 
-    def _next_type_is(self, type: TokenType):
-        return self._next is not None and self._next.type == type
+    def _next_type_is(self, type: TokenType) -> bool:
+        return self._next is not None and self._next.type is type
 
     def _stmnt(self) -> Node:
         first = self._sum()

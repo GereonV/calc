@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from tokens import Token, TokenType
+from typing import Self
 
 @dataclass(frozen=True, slots=True)
 class TokenError(Exception):
@@ -56,10 +57,10 @@ class Tokenizer:
         self._skip_while(lambda c: c.isdigit())
         return Token(TokenType.FLOAT, float(self._text[start:self._pos]), start)
 
-    def __iter__(self) -> 'Self':
+    def __iter__(self) -> Self:
         return self
 
-    def __next__(self) -> Token | None:
+    def __next__(self) -> Token:
         self._skip_while(lambda c: c == " ")
         if self._pos == len(self._text):
             raise StopIteration

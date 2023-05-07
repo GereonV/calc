@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from enum import auto, Enum
 
@@ -28,7 +29,7 @@ class NodeType(Enum):
 @dataclass(frozen=True, slots=True)
 class Node:
     type: NodeType
-    data: None # I hate Python's type hints...
+    data: str | int | float | Node | tuple[str, Node] | tuple[str, tuple[Node, ...]] | tuple[Node, Node]
 
     def __str__(self) -> str:
         data = self.data
