@@ -12,8 +12,12 @@ def tokenizer() -> str | None:
     exp = Token(TokenType.EXP, None, None)
     lpar = Token(TokenType.LPAR, None, None)
     rpar = Token(TokenType.RPAR, None, None)
+    div = Token(TokenType.DIV, None, None)
+    idiv = Token(TokenType.IDIV, None, None)
     int = lambda x: Token(TokenType.INT, x, None)
     float = lambda x: Token(TokenType.FLOAT, x, None)
+    foo = Token(TokenType.ID, "foo", None)
+    comma = Token(TokenType.COMMA, None, None)
     first_test = [a, eq, int(5), mult, int(3), minus, int(1)]
     err = lambda s, p: (s, TokenError(s, p))
     tests = [
@@ -22,12 +26,15 @@ def tokenizer() -> str | None:
         ("A= 5* 3 -1  ", first_test),
         ("5***2", [int(5), exp, mult, int(2)]),
         ("5**2", [int(5), exp, int(2)]),
+        ("5///2", [int(5), idiv, div, int(2)]),
         ("5.", [float(5)]),
         ("5.0", [float(5)]),
         ("  5.0  ", [float(5)]),
         ("  .5  ", [float(.5)]),
         (".0", [float(0)]),
         ("(3.14)", [lpar, float(3.14), rpar]),
+        ("foo(foo, A)", [foo, lpar, foo, comma, a, rpar]),
+        err(" . ", 1),
         err(";", 0),
         err("abc;", 3),
     ]
