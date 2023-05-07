@@ -24,6 +24,12 @@ class ParserError(Exception):
     expected: tuple[TokenType]
     actual: Token
 
+    def __str__(self) -> str:
+        return f"{self.actual.type.name} ∉ {{{', '.join(tt.name for tt in self.expected)}}}"
+
+    def __repr__(self) -> str:
+        return f"ParserError(expected={tuple(tt.name for tt in self.expected)}, actual={self.actual!r})"
+
 class Parser:
     __slots__ = "_tokens", "_next"
 
@@ -131,7 +137,7 @@ class Parser:
                 if not self._next_type_is(TokenType.RPAR):
                     raise ParserError((TokenType.COMMA, TokenType.RPAR), self._next)
                 node = Node(NodeType.CALL, (id, tuple(params)))
-            case _: raise ParserError(EXPECTED, current)
+            case _: raise ParserError(EXPECTED, self._next)
         self._advance()
         return node
 

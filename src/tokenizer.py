@@ -8,6 +8,9 @@ class TokenError(Exception):
     text: str
     pos: int
 
+    def __str__(self) -> str:
+        return f"{self.text[:self.pos]}_{self.text[self.pos:]}"
+
 class Tokenizer:
     __slots__ = "_text", "_pos"
 
