@@ -4,13 +4,18 @@ from nodes import Node, NodeType
 from tokens import Token, TokenType
 
 """
-<stmnt>  ::= <id>=<sum>|<sum>
+<stmnt>  ::= <id>=<sum>|<id>(<args>)=<sum>|<sum>
+<args>   ::= <id>|<args>,<id>
 <sum>    ::= <prod>|<sum>+<prod>|<sum>-<prod>
 <prod>   ::= <neg>|<prod>*<neg>|<prod>/<neg>|<prod>//<neg>
 <neg>    ::= <pow>|-<neg>
 <pow>    ::= <val>|<val>**<neg>
 <val>    ::= <id>|<id>(<params>)|<lit>|(<sum>)
 <params> ::= <sum>|<params>,<sum>
+
+Notes:
+'<id>(...)' is always chosen over '<id>'.
+'<id>[(...)]=' is always chosen over '<id>[(...)]'.
 """
 
 @dataclass(frozen=True, slots=True)
@@ -36,11 +41,21 @@ class _Parser:
 
     def _stmnt(self) -> Node:
         first = self._sum()
-        if first.type != NodeType.IDENTIFIER or not self._next_type_is(TokenType.EQ):
+        if not self._next_type_is(TokenType.EQ):
             return first
-        self._advance()
-        rhs = self._sum()
-        return Node(NodeType.ASSIGNMENT, (first.data, rhs))
+        match first.type:
+            case NodeType.IDENTIFIER:
+                self._advance()
+                rhs = self._sum()
+                return Node(NodeType.ASSIGNMENT, (first.data, rhs))
+            case NodeType.CALL:
+                args = first.data[1]
+                if all(n.type is NodeType.IDENTIFIER for n in args):
+                    args = tuple(n.data for n in args)
+                    self._advance()
+                    rhs = self._sum()
+                    return Node(NodeType.DEFINITION, (first.data[0], args, rhs))
+        return first
 
     def _sum(self) -> Node:
         lhs = self._prod()

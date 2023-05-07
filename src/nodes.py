@@ -4,6 +4,7 @@ from enum import auto, Enum
 
 class NodeType(Enum):
     ASSIGNMENT     = auto() # tuple[str, Node]
+    DEFINITION     = auto() # tuple[str, tuple[str, ...], Node]
     ADDITION       = auto() # tuple[Node, Node]
     SUBTRACTION    = auto() # tuple[Node, Node]
     MULTIPLICATION = auto() # tuple[Node, Node]
@@ -19,12 +20,13 @@ class NodeType(Enum):
 @dataclass(frozen=True, slots=True)
 class Node:
     type: NodeType
-    data: str | int | float | Node | tuple[str, Node] | tuple[str, tuple[Node, ...]] | tuple[Node, Node]
+    data: str | int | float | Node | tuple[str, Node] | tuple[str, tuple[str, ...], Node] | tuple[str, tuple[Node, ...]] | tuple[Node, Node]
 
     def __str__(self) -> str:
         data = self.data
         match self.type:
             case NodeType.ASSIGNMENT: return f"{data[0]}={data[1]}"
+            case NodeType.DEFINITION: return f"{data[0]}({','.join(data[1])})={data[2]}"
             case NodeType.ADDITION: return f"({data[0]})+({data[1]})"
             case NodeType.SUBTRACTION: return f"({data[0]})-({data[1]})"
             case NodeType.MULTIPLICATION: return f"({data[0]})*({data[1]})"
