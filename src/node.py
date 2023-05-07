@@ -29,3 +29,22 @@ class NodeType(Enum):
 class Node:
     type: NodeType
     data: None # I hate Python's type hints...
+
+    def __str__(self) -> str:
+        data = self.data
+        match self.type:
+            case NodeType.ASSIGNMENT: return f"{data[0]}={data[1]}"
+            case NodeType.ADDITION: return f"({data[0]})+({data[1]})"
+            case NodeType.SUBTRACTION: return f"({data[0]})-({data[1]})"
+            case NodeType.MULTIPLICATION: return f"({data[0]})+({data[1]})"
+            case NodeType.DIVISION: return f"({data[0]})/({data[1]})"
+            case NodeType.IDIVISION: return f"({data[0]})//({data[1]})"
+            case NodeType.NEGATION: return f"-({data})"
+            case NodeType.POWER: return f"-({data[0]})**({data[1]})"
+            case NodeType.IDENTIFIER: return data[0]
+            case NodeType.CALL: return f"{data[0]}({', '.join(d for d in data[1:])})"
+            case NodeType.INT | NodeType.FLOAT: return str(data)
+            case _: raise TypeError
+
+    def __repr__(self) -> str:
+        return f"Node({self.type.name}, {self.data!r})"
