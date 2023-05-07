@@ -1,5 +1,6 @@
 from collections.abc import Callable
-from parser import Parser
+from nodes import Node, NodeType
+from parser import Parser, ParserError
 from tokens import Token, TokenType
 from tokenizer import TokenError, Tokenizer
 
@@ -9,6 +10,8 @@ def tokenizer() -> str | None:
     mult = Token(TokenType.MULT, None, None)
     minus = Token(TokenType.MINUS, None, None)
     exp = Token(TokenType.EXP, None, None)
+    lpar = Token(TokenType.LPAR, None, None)
+    rpar = Token(TokenType.RPAR, None, None)
     int = lambda x: Token(TokenType.INT, x, None)
     float = lambda x: Token(TokenType.FLOAT, x, None)
     first_test = [a, eq, int(5), mult, int(3), minus, int(1)]
@@ -24,6 +27,7 @@ def tokenizer() -> str | None:
         ("  5.0  ", [float(5)]),
         ("  .5  ", [float(.5)]),
         (".0", [float(0)]),
+        ("(3.14)", [lpar, float(3.14), rpar]),
         err(";", 0),
         err("abc;", 3),
     ]
@@ -37,6 +41,31 @@ def tokenizer() -> str | None:
         if a != e:
             return f"failed at {s!r}\nexpected: {e}\nactual:   {a}"
 
+def parser() -> str | None:
+    a = Token(TokenType.ID, "A", None)
+    eq = Token(TokenType.EQ, None, None)
+    mult = Token(TokenType.MULT, None, None)
+    minus = Token(TokenType.MINUS, None, None)
+    exp = Token(TokenType.EXP, None, None)
+    lpar = Token(TokenType.LPAR, None, None)
+    rpar = Token(TokenType.RPAR, None, None)
+    int = lambda x: Token(TokenType.INT, x, None)
+    float = lambda x: Token(TokenType.FLOAT, x, None)
+    first_test = [a, eq, int(5), mult, int(3), minus, int(1)]
+    err = lambda s, p: (s, TokenError(s, p))
+    tests = [
+        (first_test, Node(NodeType.ASSIGNMENT,(
+            "A",
+            Node(NodeType.SUBTRACTION, (
+                Node(NodeType.MULTIPLICATION,(
+                    Node(NodeType.INT, 5),
+                    Node(NodeType.INT, 3)
+                )),
+                Node(NodeType.INT, 1)
+            ))
+        ))),
+    ]
+
 def test(name: str, function: Callable[[], str | None], errors: list[str]):
     result = function()
     if result is not None:
@@ -47,8 +76,13 @@ def test(name: str, function: Callable[[], str | None], errors: list[str]):
     print(f"Test {name}: {status}")
 
 def main():
+    tests = [
+        ("Tokenizer", tokenizer),
+        ("Parser", parser),
+    ]
     errors = []
-    test("Tokenizer", tokenizer, errors)
+    for n, t in tests:
+        test(n, t, errors)
     for e in errors:
         print(f"\n{e}")
 
