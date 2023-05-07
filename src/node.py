@@ -36,13 +36,13 @@ class Node:
             case NodeType.ASSIGNMENT: return f"{data[0]}={data[1]}"
             case NodeType.ADDITION: return f"({data[0]})+({data[1]})"
             case NodeType.SUBTRACTION: return f"({data[0]})-({data[1]})"
-            case NodeType.MULTIPLICATION: return f"({data[0]})+({data[1]})"
+            case NodeType.MULTIPLICATION: return f"({data[0]})*({data[1]})"
             case NodeType.DIVISION: return f"({data[0]})/({data[1]})"
             case NodeType.IDIVISION: return f"({data[0]})//({data[1]})"
             case NodeType.NEGATION: return f"-({data})"
-            case NodeType.POWER: return f"-({data[0]})**({data[1]})"
+            case NodeType.POWER: return f"({data[0]})**({data[1]})"
             case NodeType.IDENTIFIER: return data[0]
-            case NodeType.CALL: return f"{data[0]}({', '.join(d for d in data[1:])})"
+            case NodeType.CALL: return f"{data[0]}({', '.join(str(d) for d in data[1:])})"
             case NodeType.INT | NodeType.FLOAT: return str(data)
             case _: raise TypeError
 
