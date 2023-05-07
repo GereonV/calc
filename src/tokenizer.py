@@ -9,7 +9,8 @@ class TokenError(Exception):
     pos: int
 
     def __str__(self) -> str:
-        return f"{self.text[:self.pos]}_{self.text[self.pos:]}"
+        text = self.text[self.pos:]
+        return f"unknown token {text!r}"
 
 class Tokenizer:
     __slots__ = "_text", "_pos"
@@ -54,7 +55,7 @@ class Tokenizer:
             self._skip_while(lambda c: c.isdigit())
             if self._pos == len(self._text) or self._text[self._pos] != ".":
                 return Token(TokenType.INT, int(self._text[start:self._pos]), start)
-        elif c != ".":
+        elif c != "." or self._pos + 1 == len(self._text) or not self._text[self._pos + 1].isdigit():
             return None
         self._pos += 1
         self._skip_while(lambda c: c.isdigit())

@@ -22,8 +22,5 @@ class Token:
     value: str | int | float | None
     pos: int = field(compare=False)
 
-    def __str__(self) -> str:
-        return self.type.name if self.value is None else f"{self.type.name}={self.value!r}"
-
     def __repr__(self) -> str:
-        return f"Token({self.type.name}, {self.value!r})"
+        return f"Token({self.type}, {self.value!r})"

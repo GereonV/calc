@@ -25,10 +25,7 @@ class ParserError(Exception):
     actual: Token
 
     def __str__(self) -> str:
-        return f"{self.actual.type.name} ∉ {{{', '.join(tt.name for tt in self.expected)}}}"
-
-    def __repr__(self) -> str:
-        return f"ParserError(expected={tuple(tt.name for tt in self.expected)}, actual={self.actual!r})"
+        return f"unexpected {self.actual}"
 
 class Parser:
     __slots__ = "_tokens", "_next"

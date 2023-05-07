@@ -22,6 +22,9 @@ class Node:
     type: NodeType
     data: str | int | float | Node | tuple[str, Node] | tuple[str, tuple[str, ...], Node] | tuple[str, tuple[Node, ...]] | tuple[Node, Node]
 
+    def __repr__(self) -> str:
+        return f"Node({self.type}, {self.data!r})"
+
     def __str__(self) -> str:
         data = self.data
         match self.type:
@@ -37,6 +40,3 @@ class Node:
             case NodeType.CALL: return f"{data[0]}({','.join(map(str, data[1]))})"
             case NodeType.IDENTIFIER | NodeType.INT | NodeType.FLOAT: return str(data)
             case _: raise TypeError
-
-    def __repr__(self) -> str:
-        return f"Node({self.type.name}, {self.data!r})"
