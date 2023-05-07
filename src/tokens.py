@@ -23,7 +23,7 @@ class Token:
     pos: int = field(compare=False)
 
     def __str__(self) -> str:
-        return self.type.name if self.str is None else f"{self.type.name}={self.str!r}"
+        return self.type.name if self.value is None else f"{self.type.name}={self.value!r}"
 
     def __repr__(self) -> str:
-        return f"Token({self.type.name}, {self.str!r})"
+        return f"Token({self.type.name}, {self.value!r})"
