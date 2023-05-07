@@ -3,6 +3,16 @@ from dataclasses import dataclass
 from nodes import Node, NodeType
 from tokens import Token, TokenType
 
+"""
+<stmnt>  ::= <id>=<sum>|<sum>
+<sum>    ::= <prod>|<sum>+<prod>|<sum>-<prod>
+<prod>   ::= <neg>|<prod>*<neg>|<prod>/<neg>|<prod>//<neg>
+<neg>    ::= <pow>|-<neg>
+<pow>    ::= <val>|<val>**<neg>
+<val>    ::= <id>|<id>(<params>)|<lit>|(<sum>)
+<params> ::= <sum>|<params>,<sum>
+"""
+
 @dataclass(frozen=True, slots=True)
 class ParserError(Exception):
     expected: tuple[TokenType]

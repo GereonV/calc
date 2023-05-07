@@ -2,16 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import auto, Enum
 
-"""
-<stmnt>  ::= <id>=<sum>|<sum>
-<sum>    ::= <prod>|<sum>+<prod>|<sum>-<prod>
-<prod>   ::= <neg>|<prod>*<neg>|<prod>/<neg>|<prod>//<neg>
-<neg>    ::= <pow>|-<neg>
-<pow>    ::= <val>|<val>**<neg>
-<val>    ::= <id>|<id>(<params>)|<lit>|(<sum>)
-<params> ::= <sum>|<params>,<sum>
-"""
-
 class NodeType(Enum):
     ASSIGNMENT     = auto() # tuple[str, Node]
     ADDITION       = auto() # tuple[Node, Node]
@@ -42,7 +32,7 @@ class Node:
             case NodeType.IDIVISION: return f"({data[0]})//({data[1]})"
             case NodeType.NEGATION: return f"-({data})"
             case NodeType.POWER: return f"({data[0]})**({data[1]})"
-            case NodeType.CALL: return f"{data[0]}({', '.join(map(str, data[1]))})"
+            case NodeType.CALL: return f"{data[0]}({','.join(map(str, data[1]))})"
             case NodeType.IDENTIFIER | NodeType.INT | NodeType.FLOAT: return str(data)
             case _: raise TypeError
 
