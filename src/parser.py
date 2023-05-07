@@ -30,7 +30,7 @@ class _Parser:
             return first
         self._advance()
         rhs = self._sum()
-        return Node(NodeType.ASSIGNMENT, (first.value, rhs))
+        return Node(NodeType.ASSIGNMENT, (first.data, rhs))
 
     def _sum(self) -> Node:
         lhs = self._prod()
@@ -69,14 +69,14 @@ class _Parser:
 
     def _pow(self) -> Node:
         stack = [self._val()]
-        while self._next_type_is(NodeType.POWER):
+        while self._next_type_is(TokenType.EXP):
             self._advance()
             stack.append(self._neg())
-        while len(stack) != 1:
-            rhs = stack.pop()
+        rhs = stack.pop()
+        while stack:
             lhs = stack.pop()
-            stack.append(Node(NodeType.POWER, (lhs, rhs)))
-        return stack[0]
+            rhs = Node(NodeType.POWER, (lhs, rhs))
+        return rhs
 
     def _val(self) -> Node:
         EXPECTED = TokenType.ID, TokenType.INT, TokenType.FLOAT, TokenType.LPAR, TokenType.MINUS
