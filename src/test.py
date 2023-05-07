@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from parser import parse
+from parser import Parser
 from tokens import Token, TokenType
 from tokenizer import TokenError, Tokenizer
 

@@ -61,7 +61,7 @@ class Tokenizer:
         return self
 
     def __next__(self) -> Token:
-        self._skip_while(lambda c: c == " ")
+        self._skip_while(lambda c: c in " \t\n")
         if self._pos == len(self._text):
             raise StopIteration
         funcs = (

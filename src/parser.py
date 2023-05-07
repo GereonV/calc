@@ -1,7 +1,8 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from dataclasses import dataclass
 from nodes import Node, NodeType
 from tokens import Token, TokenType
+from typing import Self
 
 """
 <stmnt>  ::= <id>=<sum>|<id>(<args>)=<sum>|<sum>
@@ -23,11 +24,11 @@ class ParserError(Exception):
     expected: tuple[TokenType]
     actual: Token
 
-class _Parser:
+class Parser:
     __slots__ = "_tokens", "_next"
 
-    def __init__(self, tokens: Iterator[Token]):
-        self._tokens = tokens
+    def __init__(self, tokens: Iterable[Token]):
+        self._tokens = iter(tokens)
         self._advance()
 
     def _advance(self):
@@ -134,9 +135,10 @@ class _Parser:
         self._advance()
         return node
 
-def parse(tokens: Iterable[Token]) -> Node:
-    p = _Parser(iter(tokens))
-    statement = p._stmnt()
-    if p._next is not None:
-        raise ParserError((), p._next)
-    return statement
+    def __iter__(self) -> Self:
+        return self
+
+    def __next__(self) -> Node:
+        if self._next is None:
+            raise StopIteration
+        return self._stmnt()
