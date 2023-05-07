@@ -21,7 +21,7 @@ class NodeType(Enum):
     NEGATION       = auto() # Node
     POWER          = auto() # tuple[Node, Node]
     IDENTIFIER     = auto() # str
-    CALL           = auto() # tuple[str, Node, ...]
+    CALL           = auto() # tuple[str, tuple[Node, ...]]
     INT            = auto() # int
     FLOAT          = auto() # float
 
@@ -41,9 +41,8 @@ class Node:
             case NodeType.IDIVISION: return f"({data[0]})//({data[1]})"
             case NodeType.NEGATION: return f"-({data})"
             case NodeType.POWER: return f"({data[0]})**({data[1]})"
-            case NodeType.IDENTIFIER: return data[0]
-            case NodeType.CALL: return f"{data[0]}({', '.join(str(d) for d in data[1:])})"
-            case NodeType.INT | NodeType.FLOAT: return str(data)
+            case NodeType.CALL: return f"{data[0]}({', '.join(map(str, data[1]))})"
+            case NodeType.IDENTIFIER | NodeType.INT | NodeType.FLOAT: return str(data)
             case _: raise TypeError
 
     def __repr__(self) -> str:

@@ -1,6 +1,6 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from node import Node, NodeType
+from nodes import Node, NodeType
 from tokens import Token, TokenType
 
 @dataclass(frozen=True, slots=True)
@@ -104,10 +104,14 @@ class _Parser:
                     params.append(self._sum())
                 if not self._next_type_is(TokenType.RPAR):
                     raise ParserError((TokenType.COMMA, TokenType.RPAR), self._next)
-                node = Node(NodeType.CALL, (id, *params))
+                node = Node(NodeType.CALL, (id, tuple(params)))
             case _: raise ParserError(EXPECTED, current)
         self._advance()
         return node
 
 def parse(tokens: Iterable[Token]) -> Node:
-    return _Parser(iter(tokens))._stmnt()
+    p = _Parser(iter(tokens))
+    statement = p._stmnt()
+    if p._next is not None:
+        raise ParserError((), p._next)
+    return statement
