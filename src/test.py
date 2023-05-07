@@ -1,7 +1,9 @@
+from collections.abc import Callable
+from parser import parse
 from tokens import Token, TokenType
 from tokenizer import TokenError, Tokenizer
 
-def tokenizer() -> str:
+def tokenizer() -> str | None:
     a = Token(TokenType.ID, "A", None)
     eq = Token(TokenType.EQ, None, None)
     mult = Token(TokenType.MULT, None, None)
@@ -34,11 +36,21 @@ def tokenizer() -> str:
             return f"raised exception {ex!r} at {s!r}"
         if a != e:
             return f"failed at {s!r}\nexpected: {e}\nactual:   {a}"
-    return "passed"
+
+def test(name: str, function: Callable[[], str | None], errors: list[str]):
+    result = function()
+    if result is not None:
+        errors.append(f"{name} {result}")
+        status = "failed"
+    else:
+        status = "passed"
+    print(f"Test {name}: {status}")
 
 def main():
-    test = lambda n, t: print(f"{n}: {t()}")
-    test("Tokens", tokenizer)
+    errors = []
+    test("Tokenizer", tokenizer, errors)
+    for e in errors:
+        print(f"\n{e}")
 
 if __name__ == "__main__":
     main()
