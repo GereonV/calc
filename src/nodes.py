@@ -39,4 +39,3 @@ class Node:
             case NodeType.POWER: return f"({data[0]})**({data[1]})"
             case NodeType.CALL: return f"{data[0]}({','.join(map(str, data[1]))})"
             case NodeType.IDENTIFIER | NodeType.INT | NodeType.FLOAT: return str(data)
-            case _: raise TypeError
