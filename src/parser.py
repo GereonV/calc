@@ -25,7 +25,8 @@ class ParserError(Exception):
     actual: Token
 
     def __str__(self) -> str:
-        return f"unexpected {self.actual}"
+        what = "end of input" if self.actual is None else str(self.actual)
+        return f"unexpected {what}"
 
 class Parser:
     __slots__ = "_tokens", "_next"
