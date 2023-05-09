@@ -158,14 +158,13 @@ class Interpreter:
                         arg_count = len(signature(func.inner).parameters)
                         _check_parameter_count(arg, arg_count)
                         try:
-                            if (val := func.inner(*params)) is None:
-                                del self._value_stack[-arg-1:]
-                                return
+                            val = func.inner(*params)
                         except Exception as e:
                             raise InterpreterError(f"builtin raised {e!r}")
                     case _:
                         raise InterpreterError("called non-callable")
-                del self._value_stack[-arg:]
+                if arg:
+                    del self._value_stack[-arg:]
                 self._value_stack[-1] = val
             case InstructionType.OPERATION:
                 stack_err = InterpreterError(f"insufficient stack for {arg}")

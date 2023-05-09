@@ -5,14 +5,16 @@ from tokens import Token, TokenType
 from typing import Self
 
 """
-<stmnt>  ::= <id>=<sum>|<id>(<args>)=<sum>|<sum>
-<args>   ::= <id>|<args>,<id>
-<sum>    ::= <prod>|<sum>+<prod>|<sum>-<prod>
-<prod>   ::= <neg>|<prod>*<neg>|<prod>/<neg>|<prod>//<neg>
-<neg>    ::= <pow>|-<neg>
-<pow>    ::= <val>|<val>**<neg>
-<val>    ::= <id>|<id>(<params>)|<lit>|(<sum>)
-<params> ::= <sum>|<params>,<sum>
+<stmnt>   ::= <id>=<sum>|<id>(<args>)=<sum>|<sum>
+<args>    ::= |<args1>
+<args1>   ::= <id>|<args1>,<id>
+<sum>     ::= <prod>|<sum>+<prod>|<sum>-<prod>
+<prod>    ::= <neg>|<prod>*<neg>|<prod>/<neg>|<prod>//<neg>
+<neg>     ::= <pow>|-<neg>
+<pow>     ::= <val>|<val>**<neg>
+<val>     ::= <id>|<id>(<params>)|<lit>|(<sum>)
+<params>  ::= |<params1>
+<params1> ::= <sum>|<params1>,<sum>
 
 Notes:
 '<id>(...)' is always chosen over '<id>'.
@@ -128,13 +130,16 @@ class Parser:
                 if not self._next_type_is(TokenType.LPAR):
                     return Node(NodeType.IDENTIFIER, id)
                 self._advance()
-                params = [self._sum()]
-                while self._next_type_is(TokenType.COMMA):
-                    self._advance()
-                    params.append(self._sum())
-                if not self._next_type_is(TokenType.RPAR):
-                    raise ParserError((TokenType.COMMA, TokenType.RPAR), self._next)
-                node = Node(NodeType.CALL, (id, tuple(params)))
+                if self._next_type_is(TokenType.RPAR):
+                    node = Node(NodeType.CALL, (id, ()))
+                else:
+                    params = [self._sum()]
+                    while self._next_type_is(TokenType.COMMA):
+                        self._advance()
+                        params.append(self._sum())
+                    if not self._next_type_is(TokenType.RPAR):
+                        raise ParserError((TokenType.COMMA, TokenType.RPAR), self._next)
+                    node = Node(NodeType.CALL, (id, tuple(params)))
             case _: raise ParserError(EXPECTED, self._next)
         self._advance()
         return node

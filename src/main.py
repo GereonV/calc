@@ -4,7 +4,17 @@ from parser import Parser
 from tokenizer import Tokenizer
 
 def main():
-    text = "f(t,v,s)=-1/2*g*t**2+v*t+s h(t)=f(t,0,0) g=9.81 max(h(1), 0) f(1, 5, 5) f max"
+    text =\
+"""
+f(t, v, s) = -1/2*g*t**2+v*t+s
+h(t)=f(t, 0, 0)
+g=9.81
+clamp(h(1), -10, 0)
+f(1, 5, 5)
+f() = 5
+f()
+f max
+"""
     tokenizer = Tokenizer(text)
     parser = Parser(tokenizer)
     interpreter = Interpreter()
