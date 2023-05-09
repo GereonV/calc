@@ -47,9 +47,10 @@ def compile(node: Node) -> list[Instruction]:
             return [Instruction(InstructionType.LOAD, name)]
         case NodeType.CALL:
             id, params = node.data
+            instructions = sum(map(compile, params), [])
             load = Instruction(InstructionType.LOAD, id)
             call = Instruction(InstructionType.CALL, len(params))
-            return [load, call]
+            return instructions + [load, call]
         case NodeType.INT:
             int = node.data
             int = Instruction(InstructionType.INT, int)
