@@ -55,9 +55,11 @@ class Tokenizer:
             self._skip_while(lambda c: c.isdigit())
             if self._pos == len(self._text) or self._text[self._pos] != ".":
                 return Token(TokenType.INT, int(self._text[start:self._pos]), start)
+            self._pos += 1
         elif c != "." or self._pos + 1 == len(self._text) or not self._text[self._pos + 1].isdigit():
             return None
-        self._pos += 1
+        else:
+            self._pos += 2
         self._skip_while(lambda c: c.isdigit())
         return Token(TokenType.FLOAT, float(self._text[start:self._pos]), start)
 
