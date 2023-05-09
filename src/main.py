@@ -12,10 +12,7 @@ def main():
         instructions = compile(statement)
         for i in instructions:
             interpreter.interpret(i)
-    print("Stack:")
-    interpreter.print_stack()
-    print("Namespace:")
-    interpreter.print_namespace()
+    interpreter.output_stack()
 
 if __name__ == "__main__":
     main()
