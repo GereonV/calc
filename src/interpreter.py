@@ -59,12 +59,7 @@ class Interpreter:
     def __init__(self, builtins: Iterable[tuple[str, Callable[[Value, ...], Value]]] = None):
         self._value_stack = []
         self._call_stack = []
-        if builtins is None:
-            builtins = (
-                ("max", _max),
-                ("min", _min),
-            )
-        self._namespace = {name: Value(ValueType.BUILTIN, f) for name, f in builtins}
+        self.reset_namespace(builtins)
 
     def interpret(self, instruction: Instruction):
         arg = instruction.argument
@@ -155,3 +150,22 @@ class Interpreter:
                 self._value_stack.append(Value(ValueType.FLOAT, arg))
             case InstructionType.FUNCTION:
                 self._value_stack.append(Value(ValueType.FUNCTION, arg))
+
+    def print_stack(self):
+        for val in self._value_stack:
+            print(val)
+
+    def print_namespace(self):
+        for name, val in self._namespace.items():
+            print(f"{name}={val}")
+
+    def reset_stack(self):
+        self._value_stack = []
+
+    def reset_namespace(self, builtins: Iterable[tuple[str, Callable[[Value, ...], Value]]] = None):
+        if builtins is None:
+            builtins = (
+                ("max", _max),
+                ("min", _min),
+            )
+        self._namespace = {name: Value(ValueType.BUILTIN, f) for name, f in builtins}
