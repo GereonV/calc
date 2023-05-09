@@ -27,5 +27,6 @@ class Instruction:
     argument: str | int | float | Operation | tuple[int, list[Instruction]]
 
     def __repr__(self) -> str:
-        f = str if self.type is InstructionType.OPERATION else repr
-        return f"Instruction({self.type}, {f(self.argument)})"
+        arg = self.argument
+        arg = arg.name if self.type is InstructionType.OPERATION else repr(arg)
+        return f"Instruction({self.type}, {arg})"
